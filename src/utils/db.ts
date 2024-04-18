@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+require("dotenv").config();
 
 // Initialize Sequelize with SQLite dialect
 const sequelize = new Sequelize({

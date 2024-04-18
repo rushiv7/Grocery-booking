@@ -1,6 +1,6 @@
-
-
+Welcome,
 
 ***** Example .env *****
-PORT
-DB_PATH
+PORT,
+DB_PATH,
+JWT_SECRET

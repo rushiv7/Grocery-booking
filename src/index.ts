@@ -3,16 +3,18 @@ import sequelize from "./utils/db";
 import authRouter from "./routers/auth.router";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./utils/errorHandler";
+require("dotenv").config();
 
 const app: Application = express();
 const port: number = parseInt(process.env.PORT || "3000");
-app.use(express.json())
+app.use(express.json());
 app.use(cookieParser());
 
 // check db connection
 const checkDbConnection = async (): Promise<void> => {
   try {
     await sequelize.authenticate();
+    await sequelize.sync({ force: false });
     console.log("Connection has been established successfully.");
   } catch (error) {
     console.error("Unable to connect to the database:", error);
