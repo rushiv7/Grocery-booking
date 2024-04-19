@@ -3,6 +3,7 @@ import sequelize from "./utils/db";
 import authRouter from "./routers/auth.router";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
+import groceryRouter from "./routers/grocery.router";
 require("dotenv").config();
 
 const app: Application = express();
@@ -28,6 +29,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/grocery", groceryRouter);
 
 // Fallback route
 app.use((req, res) => {

@@ -1,17 +1,17 @@
 import { Router } from "express";
-import UserController from "../controllers/user.controller";
+import AuthController from "../controllers/auth.controller";
 import { authenticate } from "../middlewares/authentication";
 
 const authRouter: Router = Router();
-const userController = new UserController();
+const authController = new AuthController();
 
-authRouter.post("/register", userController.registerUser);
-authRouter.post("/signin", userController.signIn);
+authRouter.post("/register", authController.registerUser);
+authRouter.post("/signin", authController.signIn);
 
 authRouter.post(
   "/admin/previlege/:id",
   authenticate(),
-  userController.promoteToAdmin
+  authController.promoteToAdmin
 );
 
 export default authRouter;

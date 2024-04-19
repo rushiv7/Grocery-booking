@@ -6,7 +6,7 @@ import { IUserAuthInfoRequest, jwtSecret } from "../utils/constants";
 import { UserModel } from "../models";
 require("dotenv").config();
 
-export default class UserController {
+export default class AuthController {
   constructor() {}
 
   /*
