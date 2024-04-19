@@ -2,7 +2,7 @@ import express, { Application, Request, Response } from "express";
 import sequelize from "./utils/db";
 import authRouter from "./routers/auth.router";
 import cookieParser from "cookie-parser";
-import { errorHandler } from "./utils/errorHandler";
+import { errorHandler } from "./middlewares/errorHandler";
 require("dotenv").config();
 
 const app: Application = express();
