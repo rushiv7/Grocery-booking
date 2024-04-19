@@ -3,9 +3,8 @@ import sequelize from "../utils/db";
 
 interface IInventoryAttributes {
   id?: number;
-  groceryId: number;
+  grocery_id: number;
   quantity: number;
-  lastUpdated: Date;
 }
 
 interface IInventoryCreationAttributes
@@ -16,9 +15,8 @@ export class InventoryModel
   implements IInventoryAttributes
 {
   public id?: number;
-  public groceryId!: number;
+  public grocery_id!: number;
   public quantity!: number;
-  public lastUpdated!: Date;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -31,18 +29,14 @@ InventoryModel.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    groceryId: {
+    grocery_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    lastUpdated: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: 0,
     },
   },
   {

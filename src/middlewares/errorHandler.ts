@@ -13,5 +13,5 @@ export const errorHandler = (
     return responseSignature(res, 400, false, "Invalid Body");
   }
 
-  res.status(500).json({ message: "Internal server error" });
+  return responseSignature(res, 500, false, "Internal server error");
 };

@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { IUserAuthInfoRequest, jwtSecret } from "../utils/constants";
+import {
+  IUserAuthInfoRequest,
+  jwtSecret,
+  responseSignature,
+} from "../utils/constants";
 import { UserRoles } from "../utils/enums";
 
 export const authenticate = (authenticateFor = UserRoles.USER) => {
@@ -19,7 +23,12 @@ export const authenticate = (authenticateFor = UserRoles.USER) => {
       const verified = jwt.verify(token, jwtSecret);
 
       if (!verified) {
-        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+        return responseSignature(
+          res,
+          401,
+          false,
+          "Unauthorized: Invalid token"
+        );
       }
 
       const decodedInfo: any = jwt.decode(token);
@@ -41,7 +50,7 @@ export const authenticate = (authenticateFor = UserRoles.USER) => {
     } catch (error) {
       console.error(error);
       // For any other error
-      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+      return responseSignature(res, 401, false, "Unauthorized: Invalid token");
     }
   };
 };

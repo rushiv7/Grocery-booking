@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { GroceryModel } from "../models";
+import { GroceryModel, InventoryModel } from "../models";
 import { responseSignature } from "../utils/constants";
+import { Sequelize } from "sequelize";
 
 export default class GroceryController {
   constructor() {}
@@ -17,6 +18,21 @@ export default class GroceryController {
       // Offset calculation
       const offset = (page - 1) * limit;
       const { count, rows: groceries } = await GroceryModel.findAndCountAll({
+        attributes: [
+          "id",
+          "item_name",
+          "description",
+          "price",
+          [Sequelize.col("InventoryModel.quantity"), "available_qty"],
+          "createdAt",
+          "updatedAt",
+        ],
+        include: [
+          {
+            model: InventoryModel,
+            attributes: [],
+          },
+        ],
         limit,
         offset,
       });
@@ -40,7 +56,7 @@ export default class GroceryController {
   */
   async addGrocery(req: Request, res: Response, next: NextFunction) {
     try {
-      const { item_name, description, price } = req.body;
+      const { item_name, description, price, quantity } = req.body;
 
       if (!item_name || !description || isNaN(price)) {
         return responseSignature(res, 403, false, "Invalid Body");
@@ -52,7 +68,21 @@ export default class GroceryController {
         price,
       });
 
-      return responseSignature(res, 201, false, "Success", newGrocery);
+      if (newGrocery.id) {
+        // Create inventory entry for the grocery item
+        await InventoryModel.create({
+          grocery_id: newGrocery.id,
+          quantity: quantity || 0,
+        });
+      }
+
+      return responseSignature(
+        res,
+        201,
+        true,
+        "Grossary added successfully",
+        newGrocery
+      );
     } catch (error) {
       console.error("Error adding grocery:", error);
       next(error);
@@ -66,12 +96,22 @@ export default class GroceryController {
     try {
       const { id } = req.params;
 
-      const deletedRows = await GroceryModel.destroy({
-        where: { id },
+      const grocery = await GroceryModel.findByPk(id);
+
+      if (!grocery) {
+        return responseSignature(res, 404, false, "Grocery not found");
+      }
+
+      // Find the associated inventory entry
+      const inventory = await InventoryModel.findOne({
+        where: { grocery_id: id },
       });
 
-      if (deletedRows === 0) {
-        return responseSignature(res, 404, false, "Grocery not found");
+      await grocery.destroy();
+
+      if (inventory) {
+        // Delete the associated inventory entry if it exists
+        await inventory.destroy();
       }
 
       return responseSignature(res, 204, true, "");

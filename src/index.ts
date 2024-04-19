@@ -4,6 +4,8 @@ import authRouter from "./routers/auth.router";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/errorHandler";
 import groceryRouter from "./routers/grocery.router";
+import inventoryRouter from "./routers/inventory.router";
+import { responseSignature } from "./utils/constants";
 require("dotenv").config();
 
 const app: Application = express();
@@ -25,15 +27,16 @@ const checkDbConnection = async (): Promise<void> => {
 app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response) => {
-  res.status(200).send("Done");
+  responseSignature(res, 200, true, "Done");
 });
 
 app.use("/auth", authRouter);
 app.use("/grocery", groceryRouter);
+app.use("/inventory", inventoryRouter);
 
 // Fallback route
 app.use((req, res) => {
-  res.status(404).send("404 Not Found");
+  responseSignature(res, 404, false, "");
 });
 
 app.listen(port, async () => {

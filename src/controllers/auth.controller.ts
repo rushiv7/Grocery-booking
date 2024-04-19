@@ -2,7 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserRoles } from "../utils/enums";
-import { IUserAuthInfoRequest, jwtSecret } from "../utils/constants";
+import {
+  IUserAuthInfoRequest,
+  jwtSecret,
+  responseSignature,
+} from "../utils/constants";
 import { UserModel } from "../models";
 require("dotenv").config();
 
@@ -15,7 +19,7 @@ export default class AuthController {
   async registerUser(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.body?.email || !req.body?.password) {
-        return res.status(403).json({ message: "Invalid data" });
+        return responseSignature(res, 403, false, "Invalid Body");
       }
 
       const { email, password } = req.body;
@@ -26,7 +30,7 @@ export default class AuthController {
 
       // Check if user already exists
       if (user) {
-        return res.status(400).json({ message: "User already exists" });
+        return responseSignature(res, 400, false, "User already exists");
       }
 
       // Hash password
@@ -42,7 +46,7 @@ export default class AuthController {
       await newUser.save();
 
       // Return success response
-      return res.status(201).json({ message: "User registered successfully" });
+      return responseSignature(res, 201, true, "User registered successfully");
     } catch (error) {
       console.error("Error registering user:", error);
       next(error);
@@ -55,7 +59,7 @@ export default class AuthController {
   async signIn(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.body?.username || !req.body?.password) {
-        return res.status(403).json({ message: "Invalid data" });
+        return responseSignature(res, 403, false, "Invalid Body");
       }
 
       const { username, password } = req.body;
@@ -66,17 +70,23 @@ export default class AuthController {
 
       // Check if user exists
       if (!user) {
-        return res
-          .status(401)
-          .json({ message: "Invalid username or password" });
+        return responseSignature(
+          res,
+          401,
+          false,
+          "Invalid username or password"
+        );
       }
 
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
-        return res
-          .status(401)
-          .json({ message: "Invalid username or password" });
+        return responseSignature(
+          res,
+          401,
+          false,
+          "Invalid username or password"
+        );
       }
 
       // Generate JWT token
@@ -86,7 +96,7 @@ export default class AuthController {
 
       // Send JWT token as a cookie
       res.cookie("token", token, { httpOnly: true });
-      res.status(200).json({ message: "Login successful" });
+      return responseSignature(res, 200, true, "Login successful");
     } catch (error) {
       console.error("Error registering user:", error);
       next(error);
@@ -107,7 +117,7 @@ export default class AuthController {
 
       // Check if user exists
       if (!user) {
-        return res.status(400).json({ message: "Invalid request" });
+        return responseSignature(res, 400, false, "Invalid request");
       }
 
       user.role = UserRoles.ADMIN;
@@ -115,9 +125,12 @@ export default class AuthController {
       await user.save();
 
       // Return success response
-      return res
-        .status(201)
-        .json({ message: "User previlege updated successfully" });
+      return responseSignature(
+        res,
+        201,
+        true,
+        "User previlege updated successfully"
+      );
     } catch (error) {
       console.error("Error registering user:", error);
       next(error);
