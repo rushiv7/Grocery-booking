@@ -90,7 +90,7 @@ export default class AuthController {
       }
 
       // Generate JWT token
-      const token = jwt.sign({ userId: user.id, role: user.role }, jwtSecret, {
+      const token = jwt.sign({ user_id: user.id, role: user.role }, jwtSecret, {
         expiresIn: "1h",
       });
 

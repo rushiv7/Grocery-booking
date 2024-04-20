@@ -2,9 +2,9 @@ import { Model, DataTypes } from "sequelize";
 import sequelize from "../utils/db";
 
 interface IOrderAttributes {
-  id?: number;
+  id: number;
   user_id: number;
-  order_date: Date;
+  order_date?: Date;
   total_amount: number;
 }
 
@@ -14,9 +14,9 @@ export class OrderModel
   extends Model<IOrderAttributes, IOrderCreationAttributes>
   implements IOrderAttributes
 {
-  public id?: number;
+  public id!: number;
   public user_id!: number;
-  public order_date!: Date;
+  public order_date?: Date;
   public total_amount!: number;
 
   public readonly createdAt!: Date;

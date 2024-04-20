@@ -6,6 +6,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 import groceryRouter from "./routers/grocery.router";
 import inventoryRouter from "./routers/inventory.router";
 import { responseSignature } from "./utils/constants";
+import orderRouter from "./routers/order.router";
 require("dotenv").config();
 
 const app: Application = express();
@@ -33,10 +34,11 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/auth", authRouter);
 app.use("/grocery", groceryRouter);
 app.use("/inventory", inventoryRouter);
+app.use("/order", orderRouter);
 
 // Fallback route
 app.use((req, res) => {
-  responseSignature(res, 404, false, "");
+  responseSignature(res, 404, false, "Not Found");
 });
 
 app.listen(port, async () => {

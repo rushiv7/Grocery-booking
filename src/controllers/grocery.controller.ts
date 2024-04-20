@@ -14,9 +14,8 @@ export default class GroceryController {
       // Pagination parameters
       const page = parseInt(req.query.page as string) || 1; // Current page number
       const limit = parseInt(req.query.limit as string) || 10; // Number of items per page
+      const offset = (page - 1) * limit; // Offset calculation
 
-      // Offset calculation
-      const offset = (page - 1) * limit;
       const { count, rows: groceries } = await GroceryModel.findAndCountAll({
         attributes: [
           "id",
@@ -72,7 +71,7 @@ export default class GroceryController {
         // Create inventory entry for the grocery item
         await InventoryModel.create({
           grocery_id: newGrocery.id,
-          quantity: quantity || 0,
+          quantity: quantity,
         });
       }
 

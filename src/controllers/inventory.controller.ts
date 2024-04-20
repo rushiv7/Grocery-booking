@@ -10,19 +10,33 @@ export default class InventoryController {
   */
   async getInventory(req: Request, res: Response, next: NextFunction) {
     try {
-      const { grocery_id } = req.params;
+      // Pagination parameters
+      const page = parseInt(req.query.page as string) || 1; // Current page number
+      const limit = parseInt(req.query.limit as string) || 10; // Number of items per page
+      const offset = (page - 1) * limit; // Offset calculation
 
-      // Find inventory for the specified grocery item
-      const inventory = await InventoryModel.findOne({
-        where: { grocery_id },
+      const grocery_id = parseInt(req.params?.grocery_id);
+      let whereCondition: { grocery_id?: number } = {};
+
+      if (grocery_id) {
+        whereCondition = { grocery_id };
+      }
+
+      const { count, rows: inventory } = await InventoryModel.findAndCountAll({
+        where: whereCondition,
+        limit,
+        offset,
         include: [{ model: GroceryModel }],
       });
 
-      if (!inventory) {
-        return responseSignature(res, 404, false, "Inventory not found");
-      }
+      // Calculate total number of pages
+      const totalPages = Math.ceil(count / limit);
 
-      return responseSignature(res, 200, true, "Success", inventory);
+      return responseSignature(res, 200, true, "Success", {
+        totalPages: totalPages,
+        totalCount: count,
+        items: inventory,
+      });
     } catch (error) {
       console.error("Error fetching inventory:", error);
       next(error);

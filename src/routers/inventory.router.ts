@@ -7,7 +7,7 @@ const inventoryRouter: Router = Router();
 const inventoryController = new InventoryController();
 
 inventoryRouter.get(
-  "/:grocery_id",
+  "/:grocery_id?",
   authenticate(UserRoles.ADMIN),
   inventoryController.getInventory
 );
